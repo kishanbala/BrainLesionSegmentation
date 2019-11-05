@@ -1,2 +1,2 @@
 # LesionSegmentation
-This repo consists of the data for Brain lesion segmentation project. 
+This repo consists of the details for Brain lesion segmentation project. 
