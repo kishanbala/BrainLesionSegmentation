@@ -1,3 +1,6 @@
+
+#Author: Harish Kumar Harihara Subramanian (harish.harihara@st.ovgu.de)
+
 import argparse
 from glob import glob
 import nibabel as nib
