@@ -33,8 +33,14 @@ for image in image_files:
 
     for cmb_count in range(0,gt_num_data):
         cmb_pos = cen_data[cmb_count]
-        print(cmb_pos)
-        build_gt[183:183, 215:215, 103:103] = 1.0
+
+        verts = np.array(cmb_pos)
+        print(gt_file, 'Location: ', verts)
+
+        build_gt[verts[0], verts[1], verts[2]] = 1.0
+
+        #print(cmb_pos)
+        #build_gt[183:183, 215:215, 103:103] = 1.0
 
     new_image = nib.Nifti1Image(build_gt, affine=np.eye(4))
     save_path = GT_PATH + base + ext
@@ -42,4 +48,4 @@ for image in image_files:
 
         #build_gt[cmb_pos] = 1.0
     #print(gt_file)
-    break
+    #break
