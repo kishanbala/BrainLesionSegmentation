@@ -6,6 +6,7 @@ import build_unet_architecture
 import loss
 import train_network
 import save_model
+import test_model
 
 
 import pickle
@@ -49,36 +50,8 @@ import copy
 # Generate training and validation datasets
 train_loader, val_loader = train_test_split.create_train_val_dset()
 
-model = build_unet_architecture.CleanU_Net().cuda()
-criterion = loss.BCELoss2d().cuda()
-optimizer = optim.SGD(model.parameters(),
-                      weight_decay=1e-4,
-                      lr=1e-4,
-                      momentum=0.9,
-                      nesterov=True)
+# Train the network and save the best model in 'model_best.pth.tar'
+#train_network.train_dataset(train_loader)
 
-# set somo global vars
-experiment = "your_experiment"
-logger = SummaryWriter(comment=experiment)
-best_loss = 0
-
-# run the training loop
-num_epochs = 20
-for epoch in range(0, num_epochs):
-    # train for one epoch
-    curr_loss = train_network.train(train_loader, model, criterion, epoch, num_epochs)
-
-    # store best loss and save a model checkpoint
-    is_best = curr_loss < best_loss
-    best_loss = max(curr_loss, best_loss)
-    save_model.save_checkpoint({
-        'epoch': epoch + 1,
-        'arch': experiment,
-        'state_dict': model.state_dict(),
-        'best_prec1': best_loss,
-        'optimizer': optimizer.state_dict(),
-    }, is_best)
-
-logger.close()
-
+test_model.test(val_loader)
 
