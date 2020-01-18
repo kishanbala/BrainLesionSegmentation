@@ -10,7 +10,7 @@ import loss
 import os
 from collections import OrderedDict
 
-path = 'model_best.pth.tar'
+path = 'model_best_bce.pth.tar'
 device = torch.device('cuda')
 model = build_unet_architecture.CleanU_Net()
 model.to(device)
@@ -19,7 +19,9 @@ state = torch.load(path)
 
 # load params
 model.load_state_dict(state['state_dict'])
+#criterion = torch.nn.Sigmoid()
 criterion = loss.BCELoss2d().cuda()
+#loss.BCELoss2d().cuda()
 
 def test(val_loader):
 
@@ -51,13 +53,21 @@ def test(val_loader):
             os.mkdir(file_path)
 
             image_ = np.squeeze(images[index].cpu().data.numpy())
-            plt.imsave(file_path + '\\original_image.png',image_)
+
+            plt.imsave(file_path + '\\original_image.png',image_,cmap='gray')
 
             label_ = np.squeeze(labels[index].cpu().data.numpy())
-            plt.imsave(file_path + '\\original_seg_output.png', label_)
+            plt.imsave(file_path + '\\original_seg_output.png', label_,cmap='gray')
 
-            pred_ = np.squeeze(outputs[index].cpu().data.numpy())
-            plt.imsave(file_path + '\\predicted_seg_output.png', pred_)
+            pred_ = torch.sigmoid(outputs[index].cpu())
+            pred_ = torch.Tensor(pred_)
+            pred_ = np.squeeze(pred_)
+
+            print(pred_.min(), pred_.max())
+            # pred_ = torch.sigmoid(outputs[index].cpu())
+            # pred_ = np.squeeze(pred_.data.numpy())
+            #pred_ = np.squeeze(outputs[index].cpu().data.numpy())
+            plt.imsave(file_path + '\\predicted_seg_output.png', pred_,cmap='gray')
 
             id += 1
 

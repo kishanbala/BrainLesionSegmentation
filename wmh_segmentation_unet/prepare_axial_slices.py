@@ -64,7 +64,7 @@ def folder_to_convert():
     for i in range(0, patient_num):
         if i < 20:
             IN_DIR = 'P:\\WMH\\Utrecht\\Utrecht'
-            OUT_DIR = 'P:\\WMH\\'
+            OUT_DIR = 'P:\\WMH\\Train\\'
             dirs = os.listdir(IN_DIR)
             a = dirs.__getitem__(i)
             path = IN_DIR + '\\' + a + '\\pre'
@@ -83,12 +83,12 @@ def folder_to_convert():
             MASK_out_dir = out_dir+'\\MASK'
             os.mkdir(MASK_out_dir)
 
-            convert_to_slice(img_dir, FLAIR_out_dir, flair=True, mask=False, min_range=0.1, max_range=0.9)
-            convert_to_slice(mask_dir, MASK_out_dir, flair= False, mask= True, min_range=0.1, max_range=0.9)
+            convert_to_slice(img_dir, FLAIR_out_dir, flair=True, mask=False)
+            convert_to_slice(mask_dir, MASK_out_dir, flair= False, mask= True)
 
         elif (i>=20) and (i<40):
             IN_DIR = 'P:\\WMH\\Singapore\\Singapore'
-            OUT_DIR = 'P:\\WMH\\'
+            OUT_DIR = 'P:\\WMH\\Train\\'
 
             dirs = os.listdir(IN_DIR)
             a = dirs.__getitem__(i%20)
@@ -108,12 +108,12 @@ def folder_to_convert():
             MASK_out_dir = out_dir + '\\MASK'
             os.mkdir(MASK_out_dir)
 
-            convert_to_slice(img_dir, FLAIR_out_dir, flair=True, mask=False, min_range=0.1, max_range=0.9)
-            convert_to_slice(mask_dir, MASK_out_dir, flair=False, mask=True, min_range=0.1, max_range=0.9)
+            convert_to_slice(img_dir, FLAIR_out_dir, flair=True, mask=False)
+            convert_to_slice(mask_dir, MASK_out_dir, flair=False, mask=True)
 
         else:
             IN_DIR = 'P:\\WMH\\Amsterdam_GE3T\\GE3T'
-            OUT_DIR = 'P:\\WMH\\'
+            OUT_DIR = 'P:\\WMH\\Train\\'
 
             dirs = os.listdir(IN_DIR)
             a = dirs.__getitem__(i%40)
@@ -133,5 +133,5 @@ def folder_to_convert():
             MASK_out_dir = out_dir + '\\MASK'
             os.mkdir(MASK_out_dir)
 
-            convert_to_slice(img_dir, FLAIR_out_dir, flair=True, mask=False, min_range=0.1, max_range=0.9)
-            convert_to_slice(mask_dir, MASK_out_dir, flair=False, mask=True, min_range=0.1, max_range=0.9)
+            convert_to_slice(img_dir, FLAIR_out_dir, flair=True, mask=False)
+            convert_to_slice(mask_dir, MASK_out_dir, flair=False, mask=True)
