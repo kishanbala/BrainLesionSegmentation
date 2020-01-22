@@ -36,4 +36,4 @@ def prepare_train_data():
 
     pickle_out = open("Y.pickle", 'wb')
     pickle.dump(y, pickle_out)
-    pickle_out.close()
+    pickle_out.close() 

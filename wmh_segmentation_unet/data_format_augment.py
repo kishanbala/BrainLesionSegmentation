@@ -1,22 +1,22 @@
 import pickle
-from torchvision import transforms
 from PIL import Image
 import numpy as np
 import torch
+from torchvision import transforms
 
 class GenericImageDataset():
     '''
     Incorporate different transformations as specified on the given images
     '''
 
-    def __init__(self, X, y, transformations):
+    def __init__(self, X, y,  transformations):
         self.X = X
         self.y = y
         self.transformations = transformations
 
     def __getitem__(self, index):
-        max = 1
-        min = 0
+        max_val = 1.0
+        min_val = 0.0
 
         image = self.X[index]
         mask = self.y[index]
@@ -24,29 +24,14 @@ class GenericImageDataset():
         image = Image.open(image)
         mask = Image.open(mask)
 
-        image = image.resize((200,200), resample=Image.NEAREST)
-        mask = mask.resize((200, 200), resample=Image.NEAREST)
+        image = np.array(image, dtype=np.float32)
+        mask = np.array(mask, dtype=np.float32)
 
-        image = np.asarray(image,dtype=np.float32)
-        mask = np.asarray(mask,dtype=np.float32)
+        if self.transformations is not None:
+            image_tensor = self.transformations(image)
+            mask_tensor = self.transformations(mask)
 
-        image_new = (image - np.min(image)) * (max - min) / (np.max(image) - np.min(image)) + min
-        image_new = np.expand_dims(image_new,axis=0)
-        image_tensor = torch.Tensor(image_new)
-
-        # mask_new = (mask - np.min(mask)) * (max - min) / (np.max(mask) - np.min(mask)) + min
-        mask_new = np.expand_dims(mask, axis=0)
-        mask_tensor = torch.Tensor(mask_new)
-
-        #image = np.array(image, dtype=np.uint8)
-        #mask = np.array(mask, dtype=np.uint8)
-
-        # if self.transformations is not None:
-        #     image_tensor = self.transformations(image)
-        #     mask_tensor = self.transformations(mask)
-
-        print(image_tensor.shape, mask_tensor.shape)
-        return  image_tensor, mask_tensor
+        return image_tensor, mask_tensor
 
 def data_to_dim_shape():
     '''
@@ -64,85 +49,21 @@ def data_to_dim_shape():
     pickle_in = open('y.pickle', 'rb')
     y_path = pickle.load(pickle_in)
 
-
-    ## RESIZE
-    trans1 = transforms.Compose([
-        #transforms.ToPILImage(),
-        transforms.Resize((200,200)),
+    trans = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Resize((200, 200),interpolation=Image.NEAREST),
         transforms.ToTensor()
     ])
 
-    # ## RESIZE AND ROTATE
-    # trans2 = transforms.Compose([
-    #     transforms.ToPILImage(),
-    #     transforms.Resize((200,200)),
-    #     transforms.RandomAffine(degrees=[-15, 15]),
-    #     transforms.ToTensor()
-    # ])
-    #
-    # ## RESIZE AND SCALE
-    # trans3 = transforms.Compose([
-    #     transforms.ToPILImage(),
-    #     transforms.Resize((200,200)),
-    #     transforms.RandomAffine(degrees=0, scale=[0.9, 1.1]),
-    #     transforms.ToTensor()
-    # ])
-    #
-    # ## RESIZE AND SHEAR
-    # trans4 = transforms.Compose([
-    #     transforms.ToPILImage(),
-    #     transforms.Resize((200,200)),
-    #     transforms.RandomAffine(degrees=0, shear=[-18, 18]),
-    #     transforms.ToTensor()
-    # ])
-
-    ## APPENDING RESIZED IMAGES
     dset_train = GenericImageDataset(X_path,
                                      y_path,
-                                     trans1)
+                                     trans)
 
     train_data = []
     for index in range(0, len(dset_train.X)):
         image, label = dset_train.__getitem__(index)
-        #break
-        print(image.max(), image.min(), label.max(), label.min())
         train_data.append([image, label])
-
-    # ## APPENDING ROTATED IMAGES
-    # dset_train = GenericImageDataset(X_path,
-    #                                  y_path,
-    #                                  trans2)
-    #
-    # for index in range(0, len(dset_train.X)):
-    #     image, label = dset_train.__getitem__(index)
-    #     #break
-    #     train_data.append([image, label])
-    #
-    # ## APPENDING SCALED IMAGES
-    # dset_train = GenericImageDataset(X_path,
-    #                                  y_path,
-    #                                  trans3)
-    #
-    #
-    # for index in range(0, len(dset_train.X)):
-    #     image, label = dset_train.__getitem__(index)
-    #     #break
-    #     train_data.append([image, label])
-    #
-    # ## APPENDING SHEARED IMAGES
-    # dset_train = GenericImageDataset(X_path,
-    #                                  y_path,
-    #                                  trans4)
-    #
-    #
-    # for index in range(0, len(dset_train.X)):
-    #     image, label = dset_train.__getitem__(index)
-    #     #break
-    #     train_data.append([image, label])
-
-    print(len(train_data))
 
     pickle_out = open("tensor.pickle", 'wb')
     pickle.dump(train_data, pickle_out)
     pickle_out.close()
-

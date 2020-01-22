@@ -19,12 +19,11 @@ class FullTrainningDataset(torch.utils.data.Dataset):
         return self.full_ds[i + self.offset]
 
 ## SET VALIDATION SET SIZE & BATCH SIZE
-validationRatio = 0.20
+validationRatio = 0.40
 batch_size = 10
 
 def trainTestSplit(dataset, val_share=validationRatio):
     '''
-
     :param dataset: Complete dataset in X,y pair after formatting & augmenting
     :param val_share: Validation dataset size
     :return: Train and test datasets

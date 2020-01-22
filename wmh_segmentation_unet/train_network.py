@@ -4,11 +4,7 @@ from torch.autograd import Variable
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 from torchvision.utils import make_grid
-import build_unet_architecture
-import loss
-import save_model
-import dice_loss
-import torch
+
 
 experiment = "your_experiment"
 logger = SummaryWriter(comment=experiment)
@@ -43,14 +39,8 @@ def train(train_loader, model, criterion, epoch, num_epochs):
         optimizer.zero_grad()
         outputs = model(images)
 
-        # sigmoid function
-        #outputs = torch.sigmoid(outputs)
-
-        #print('Min: ', outputs.min(),  ' Max: ', outputs.max())
-
         # measure loss
         loss = criterion(outputs, labels)
-
         losses.update(loss.data, images.size(0))
 
         # compute gradient and do SGD step
@@ -84,35 +74,3 @@ def train(train_loader, model, criterion, epoch, num_epochs):
 
     # return avg loss over the epoch
     return losses.avg
-
-def train_dataset(train_loader):
-    model = build_unet_architecture.CleanU_Net().cuda()
-
-    criterion = loss.BCELoss2d().cuda()#torch.nn.BCELoss() #
-
-    optimizer = optim.SGD(model.parameters(),
-                          weight_decay=1e-4,
-                          lr=1e-4,
-                          momentum=0.9,
-                          nesterov=True)
-    # set somo global vars
-    experiment = "your_experiment"
-    logger = SummaryWriter(comment=experiment)
-    best_loss = 0
-    # run the training loop
-    num_epochs = 30
-    for epoch in range(0, num_epochs):
-        # train for one epoch
-        curr_loss = train(train_loader, model, criterion, epoch, num_epochs)
-
-        # store best loss and save a model checkpoint
-        is_best = curr_loss < best_loss
-        best_loss = max(curr_loss, best_loss)
-        save_model.save_checkpoint({
-            'epoch': epoch + 1,
-            'arch': experiment,
-            'state_dict': model.state_dict(),
-            'best_prec1': best_loss,
-            'optimizer': optimizer.state_dict(),
-        }, is_best)
-    logger.close()

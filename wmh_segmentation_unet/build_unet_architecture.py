@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from torch.nn.functional import sigmoid
 
 class CleanU_Net(nn.Module):
 
@@ -208,7 +207,4 @@ class CleanU_Net(nn.Module):
         # Final output
         x = self.conv_final(x)
 
-        return x
-
-model = CleanU_Net()
-print(model)
+        return x 

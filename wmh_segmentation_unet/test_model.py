@@ -10,20 +10,19 @@ import loss
 import os
 from collections import OrderedDict
 
-path = 'model_best_bce.pth.tar'
-device = torch.device('cuda')
-model = build_unet_architecture.CleanU_Net()
-model.to(device)
-model.eval()
-state = torch.load(path)
 
-# load params
-model.load_state_dict(state['state_dict'])
-#criterion = torch.nn.Sigmoid()
 criterion = loss.BCELoss2d().cuda()
-#loss.BCELoss2d().cuda()
 
-def test(val_loader):
+def test(val_loader, epoch_index):
+    path = 'checkpoints\\checkpoint_' + str(epoch_index) + '.pth.tar'
+    device = torch.device('cuda')
+    model = build_unet_architecture.CleanU_Net()
+    model.to(device)
+    model.eval()
+    state = torch.load(path)
+
+    # load params
+    model.load_state_dict(state['state_dict'])
 
 
     losses = log_values.AverageMeter()
@@ -48,28 +47,20 @@ def test(val_loader):
         optimizer.zero_grad()
         outputs = model(images)
 
-        for index in range(0,len(images)):
-            file_path = 'validation\\input_image_' + str(id)
-            os.mkdir(file_path)
-
-            image_ = np.squeeze(images[index].cpu().data.numpy())
-
-            plt.imsave(file_path + '\\original_image.png',image_,cmap='gray')
-
-            label_ = np.squeeze(labels[index].cpu().data.numpy())
-            plt.imsave(file_path + '\\original_seg_output.png', label_,cmap='gray')
-
-            pred_ = torch.sigmoid(outputs[index].cpu())
-            pred_ = torch.Tensor(pred_)
-            pred_ = np.squeeze(pred_)
-
-            print(pred_.min(), pred_.max())
-            # pred_ = torch.sigmoid(outputs[index].cpu())
-            # pred_ = np.squeeze(pred_.data.numpy())
-            #pred_ = np.squeeze(outputs[index].cpu().data.numpy())
-            plt.imsave(file_path + '\\predicted_seg_output.png', pred_,cmap='gray')
-
-            id += 1
+        # for index in range(0,len(images)):
+        #     file_path = 'validation\\input_image_' + str(id)
+        #     os.mkdir(file_path)
+        #
+        #     image_ = np.squeeze(images[index].cpu().data.numpy())
+        #     plt.imsave(file_path + '\\original_image.png',image_)
+        #
+        #     label_ = np.squeeze(labels[index].cpu().data.numpy())
+        #     plt.imsave(file_path + '\\original_seg_output.png', label_)
+        #
+        #     pred_ = np.squeeze(outputs[index].cpu().data.numpy())
+        #     plt.imsave(file_path + '\\predicted_seg_output.png', pred_)
+        #
+        #     id += 1
 
         # measure loss
         loss = criterion(outputs, labels)
@@ -79,8 +70,10 @@ def test(val_loader):
         loss.backward()
         optimizer.step()
 
-        print('data/(train)loss_val', losses.val, i + 1)
-        print('data/(train)loss_avg', losses.avg, i + 1)
+        #print('data/(train)loss_val', losses.val, i + 1)
+        #print('data/(train)loss_avg', losses.avg, i + 1)
 
         pbar.set_description('[TEST] - BATCH LOSS: %.4f/ %.4f(avg) '
                              % (losses.val, losses.avg))
+
+    return losses.avg
