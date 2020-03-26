@@ -2,10 +2,12 @@ import nibabel as nib
 import numpy as np
 import os
 import random
+from sklearn.externals import joblib
 
 
-# input_dir = '/Volumes/Seagate Backup Plus Drive/Dataset-CMB/ADNI-CMBs/output/ADNI 4/test_in'
-# gt_dir = '/Volumes/Seagate Backup Plus Drive/Dataset-CMB/ADNI-CMBs/output/ADNI 4/test_gt'
+input_dir = 'D:\\de\\12_credit\\crebral_microbleeds\\adni\\ADNI 4\\normalized_patches'
+
+gt_dir = 'D:\\de\\12_credit\\crebral_microbleeds\\adni\\ADNI 4\\gt_patches'
 
 def balanced_dataset(input_dir, gt_dir):
 
@@ -34,16 +36,16 @@ def balanced_dataset(input_dir, gt_dir):
             input_image = os.path.join(input_sub_dir, in_patch)
             gt_image = os.path.join(gt_sub_dir, gt_patch)
 
-            FLAIR_image_in = nib.load(input_image).get_fdata()
+            FLAIR_image_in = nib.load(input_image).get_data()
             FLAIR_image_in = np.array(FLAIR_image_in)
 
-            FLAIR_image_gt = nib.load(gt_image).get_fdata()
+            FLAIR_image_gt = nib.load(gt_image).get_data()
             FLAIR_image_gt = np.array(FLAIR_image_gt)
 
             if FLAIR_image_gt.max() == 1.0:
                 positive_list.append((FLAIR_image_in, FLAIR_image_gt))
                 count_pos +=1
-                print('gt : ' + gt_patch)
+                # print('gt : ' + gt_patch)
             else:
                 negative_list.append((FLAIR_image_in, FLAIR_image_gt))
                 count_neg +=1
@@ -54,6 +56,11 @@ def balanced_dataset(input_dir, gt_dir):
 
     balanced_list = positive_list + negative_list_1
     print(len(positive_list))
-    print(len(negative_list))
+    print(len(negative_list_1))
+    print(len(balanced_list))
 
     return balanced_list
+
+train_data = balanced_dataset(input_dir,gt_dir)
+filename = 'tensor.sav'
+joblib.dump(train_data, filename)
